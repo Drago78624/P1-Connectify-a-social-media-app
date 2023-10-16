@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
 import TestProfImg from "../assets/sasuke-github.jpeg";
 import Navbar from "../components/Navbar";
 import Drawer from "../components/Drawer";
@@ -9,6 +9,7 @@ import { MdSend } from "react-icons/md";
 import ChatPreview from "../components/ChatPreview";
 
 const Home = () => {
+
   return (
     <div className="h-screen">
       <Navbar />
