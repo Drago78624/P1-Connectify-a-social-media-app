@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import TestProfImg from "../assets/sasuke-github.jpeg";
 import Navbar from "../components/Navbar";
@@ -7,11 +7,75 @@ import { RiMenu2Line } from "react-icons/ri";
 import { BsArrowUpLeft } from "react-icons/bs";
 import { MdSend } from "react-icons/md";
 import ChatPreview from "../components/ChatPreview";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { db } from "../firebase.config";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Home = () => {
+  const [error, setError] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+  // SEARCH
+  const [user, setUser] = useState(null);
+
+  const formSchema = yup.object().shape({
+    username: yup.string().required("Please enter a user name"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(formSchema),
+  });
+
+  const searchUser = async (data) => {
+    console.log("searching...");
+    const q = query(
+      collection(db, "users"),
+      where("displayName", "==", data.username)
+    );
+    try {
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        setUser(doc.data());
+      });
+    } catch (err) {
+      console.log(err);
+      setError(true);
+    }
+  };
+
+  const handleSelect = async () => {
+    const combinedId =
+      currentUser.uid > user.uid
+        ? currentUser.uid + user.uid
+        : user.uid + currentUser.uid;
+
+      try {
+        const res = await getDocs(db, "chats", combinedId)
+
+        if(!res.exists()){
+          await setDoc(doc, (db, "chats", combinedId), {messages: []})
+        }
+      }catch(err){
+        console.log(err)
+      }
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setError(false);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, [error]);
 
   return (
     <div className="h-screen">
+      {error && <Alert />}
       <Navbar />
       <Drawer />
       <div className="p-4 flex justify-between items-center lg:hidden">
@@ -29,13 +93,28 @@ const Home = () => {
         <div className="lg:block min-h-[500px] max-h-[750px] overflow-y-auto hidden flex-[2] bg-base-200 p-4">
           <div>
             <h2 className="text-xl font-semibold mb-4">Your Connections</h2>
-            <form action="">
-              <input
-                type="text"
-                placeholder="Find User"
-                className="input input-bordered w-full max-w-md"
-              />
+            <form onSubmit={handleSubmit(searchUser)}>
+              <div className="form-control">
+                <input
+                  type="text"
+                  placeholder="Find a User"
+                  className="input input-bordered w-full max-w-md"
+                  {...register("username")}
+                />
+                <p className="text-error mt-1">
+                  {errors.username && errors.username.message}
+                </p>
+              </div>
             </form>
+            <div className="mt-4" onClick={handleSelect}>
+              {error && <span>User Not Found !</span>}
+              {user && (
+                <ChatPreview
+                  displayName={user.displayName}
+                  photoURL={user.photoURL}
+                />
+              )}
+            </div>
             <div className="divider"></div>
             <div>
               <ChatPreview />
@@ -79,9 +158,7 @@ const Home = () => {
                   <img src={TestProfImg} />
                 </div>
               </div>
-              <div className="chat-header">
-                Obi-Wan Kenobi
-              </div>
+              <div className="chat-header">Obi-Wan Kenobi</div>
               <div className="chat-bubble">You were the Chosen One!</div>
               <div className="chat-footer opacity-50">Just now</div>
             </div>
@@ -91,9 +168,7 @@ const Home = () => {
                   <img src={TestProfImg} />
                 </div>
               </div>
-              <div className="chat-header">
-                Anakin
-              </div>
+              <div className="chat-header">Anakin</div>
               <div className="chat-bubble">I hate you!</div>
               <div className="chat-footer opacity-50">Just now</div>
             </div>

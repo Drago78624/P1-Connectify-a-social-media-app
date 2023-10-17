@@ -43,6 +43,7 @@ const SignIn = () => {
     }, 2000);
     return () => clearTimeout(timeout);
   }, [error]);
+  
   return (
     <div className="min-h-screen flex justify-center items-center">
       {error && <Alert />}
