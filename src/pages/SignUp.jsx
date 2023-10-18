@@ -40,11 +40,12 @@ const SignUp = () => {
         data.email,
         data.password
       );
-
+      //  SAVING USER AVATAR IN FIREBASE STORAGE
       const storageRef = ref(storage, data.displayName);
 
       const uploadTask = uploadBytesResumable(storageRef, data.avatar[0]);
 
+      // TODO: SHOWING THE STATUS OF UPLOAD EVEN THOUGH SHOWING IT ONLY IN CONSOLE , WILL MAKE SOME UI FOR IT LATER 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
@@ -64,6 +65,7 @@ const SignUp = () => {
           setError(true);
           setLoading(false);
         },
+        // SAVING USER DATA ( UID, DISPLAYNAME, EMAIL, PHOTOURL ) IN FIRESTORE AFTER SIGN UP
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             await updateProfile(res.user, {
@@ -76,6 +78,7 @@ const SignUp = () => {
               email: data.email,
               photoURL: downloadURL,
             });
+            // CREATING USERCHATS COLLECTION ON SIGN UP FOR LATER USAGE OF MESSAGING
             await setDoc(doc(db, "userChats", res.user.uid), {});
             setLoading(false);
             navigate("/");

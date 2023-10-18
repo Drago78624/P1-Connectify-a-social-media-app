@@ -13,6 +13,7 @@ const Drawer = () => {
           className="drawer-overlay"
         ></label>
         <div className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+          {/* DRAWER CONTENT */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Your Connections</h2>
             <form action="">

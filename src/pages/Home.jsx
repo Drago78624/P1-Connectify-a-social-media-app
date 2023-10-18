@@ -10,15 +10,26 @@ import ChatPreview from "../components/ChatPreview";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase.config";
 import { AuthContext } from "../contexts/AuthContext";
 
 const Home = () => {
   const [error, setError] = useState(false);
   const { currentUser } = useContext(AuthContext);
-  // SEARCH
   const [user, setUser] = useState(null);
+  const [chats, setChats] = useState([]);
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Please enter a user name"),
@@ -27,11 +38,12 @@ const Home = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(formSchema),
   });
-
+  // SEARCH
   const searchUser = async (data) => {
     console.log("searching...");
     const q = query(
@@ -45,26 +57,59 @@ const Home = () => {
       });
     } catch (err) {
       console.log(err);
+      console.log("user not found");
       setError(true);
     }
   };
-
+  // ADDING/SELECTING USER AFTER SEARCH
   const handleSelect = async () => {
     const combinedId =
       currentUser.uid > user.uid
         ? currentUser.uid + user.uid
         : user.uid + currentUser.uid;
 
-      try {
-        const res = await getDocs(db, "chats", combinedId)
+    try {
+      const res = await getDoc(doc(db, "chats", combinedId));
 
-        if(!res.exists()){
-          await setDoc(doc, (db, "chats", combinedId), {messages: []})
-        }
-      }catch(err){
-        console.log(err)
+      if (!res.exists()) {
+        await setDoc(doc(db, "chats", combinedId), { messages: [] });
+
+        const updateRes = await updateDoc(
+          doc(db, "userChats", currentUser.uid),
+          {
+            [combinedId + ".userInfo"]: {
+              uid: user.uid,
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+            },
+            [combinedId + ".date"]: serverTimestamp(),
+          }
+        );
+
+        console.log(updateRes);
+
+        await updateDoc(doc(db, "userChats", user.uid), {
+          [combinedId + ".userInfo"]: {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+          },
+          [combinedId + ".date"]: serverTimestamp(),
+        });
       }
+    } catch (err) {
+      console.log(err);
+    }
+    setUser(null);
+    reset();
   };
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "userChats", currentUser.uid), (doc) => {
+      setChats(doc.data());
+    });
+    return () => unsub()
+  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -90,9 +135,10 @@ const Home = () => {
       </div>
       {/* Chat Window */}
       <div className="h-[70%] mt-10 lg:h-auto container max-w-7xl mx-auto flex justify-center shadow-lg">
-        <div className="lg:block min-h-[500px] max-h-[750px] overflow-y-auto hidden flex-[2] bg-base-200 p-4">
+        <div className="lg:block min-h-[800px] overflow-y-auto hidden flex-[2] bg-base-200 p-4">
           <div>
             <h2 className="text-xl font-semibold mb-4">Your Connections</h2>
+            {/* SEARCH USER UI */}
             <form onSubmit={handleSubmit(searchUser)}>
               <div className="form-control">
                 <input
@@ -106,8 +152,9 @@ const Home = () => {
                 </p>
               </div>
             </form>
+            {/* SHOWING USER IF ANY AFTER SEARCH */}
+            {error && <span>User Not Found !</span>}
             <div className="mt-4" onClick={handleSelect}>
-              {error && <span>User Not Found !</span>}
               {user && (
                 <ChatPreview
                   displayName={user.displayName}
@@ -117,25 +164,9 @@ const Home = () => {
             </div>
             <div className="divider"></div>
             <div>
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
-              <ChatPreview />
+              {Object.entries(chats)?.map(chat => {
+                return <ChatPreview key={chat[0]} displayName={chat[1].userInfo.displayName} photoURL={chat[1].userInfo.photoURL} lastMessage={chat[1]?.lastMessage?.text && false} />
+              })}
             </div>
           </div>
         </div>

@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import TestProfImg from "../assets/sasuke-github.jpeg";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase.config";
 import { AuthContext } from "../contexts/AuthContext";
