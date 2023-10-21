@@ -25,13 +25,13 @@ const Chats = () => {
 
   return (
     <div>
-      {Object.entries(chats)?.map((chat) => {
+      {Object.entries(chats)?.sort((a, b) => b[1].date - a[1].date).map((chat) => {
         return (
           <div key={chat[0]} onClick={() => openChat(chat[1].userInfo)}>
             <ChatPreview
               displayName={chat[1].userInfo.displayName}
               photoURL={chat[1].userInfo.photoURL}
-              lastMessage={chat[1]?.lastMessage?.text && false}
+              lastMessage={chat[1].lastMessage?.textMsg}
             />
           </div>
         );

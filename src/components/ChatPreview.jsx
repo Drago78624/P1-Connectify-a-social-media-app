@@ -11,7 +11,7 @@ const ChatPreview = (props) => {
       </div>
       <div>
         <h3 className="text-lg font-semibold mb-1">{props.displayName}</h3>
-        {props.lastMessage && <p>{props.lastMessage}</p>}
+        {<p>{props.lastMessage}</p>}
       </div>
     </div>
   );

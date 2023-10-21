@@ -5,7 +5,13 @@ import { ChatContext } from "../contexts/ChatContext";
 import { BiImageAlt } from "react-icons/bi";
 import { useForm } from "react-hook-form";
 import { db, storage } from "../firebase.config";
-import { Timestamp, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import {
+  Timestamp,
+  arrayUnion,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
@@ -72,6 +78,21 @@ const SendMessage = () => {
         }),
       });
     }
+
+    await updateDoc(doc(db, "userChats", currentUser.uid), {
+      [data.chatId + ".lastMessage"]: {
+        textMsg,
+      },
+      [data.chatId + ".date"]: serverTimestamp(),
+    });
+
+    await updateDoc(doc(db, "userChats", data.user.uid), {
+      [data.chatId + ".lastMessage"]: {
+        textMsg,
+      },
+      [data.chatId + ".date"]: serverTimestamp(),
+    });
+
     reset();
   };
 

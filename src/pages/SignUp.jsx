@@ -103,7 +103,6 @@ const SignUp = () => {
       {error && <Alert />}
       <div className="container mx-auto max-w-md p-4">
         <div className="text-center mb-10">
-          <Link to="/">heelu</Link>
           <h1 className="text-3xl mb-2 font-semibold">Sign up</h1>
           <p className="text-xl">Join us and start connecting!</p>
         </div>
@@ -163,12 +162,12 @@ const SignUp = () => {
             />
           </div>
           {loading ? (
-            <button className="w-full btn btn-primary shadow-lg mb-4">
+            <button className="w-full btn btn-secondary shadow-lg mb-4">
               <span className="loading loading-spinner"></span>
               Signing up
             </button>
           ) : (
-            <button className="w-full btn btn-primary shadow-lg mb-4">
+            <button className="w-full btn btn-secondary shadow-lg mb-4">
               Sign up
             </button>
           )}
