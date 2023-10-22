@@ -46,7 +46,7 @@ const Navbar = () => {
           Connectify
         </Link>
         <div className="flex items-center gap-5">
-          <div className="dropdown dropdown-end">
+          {/* <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn m-1">
               Themes
             </label>
@@ -62,7 +62,7 @@ const Navbar = () => {
                 );
               })}
             </ul>
-          </div>
+          </div> */}
           <div className="avatar hidden lg:inline-block">
             <div className="w-12 rounded-full">
               <img src={currentUser.photoURL} />

@@ -164,7 +164,6 @@ const SignUp = () => {
           {loading ? (
             <button className="w-full btn btn-secondary shadow-lg mb-4">
               <span className="loading loading-spinner"></span>
-              Signing up
             </button>
           ) : (
             <button className="w-full btn btn-secondary shadow-lg mb-4">

@@ -77,12 +77,11 @@ const SignIn = () => {
             </p>
           </div>
           {loading ? (
-            <button className="w-full btn btn-primary shadow-lg mb-4">
+            <button className="w-full btn btn-secondary shadow-lg mb-4">
               <span className="loading loading-spinner"></span>
-              Signing in
             </button>
           ) : (
-            <button className="w-full btn btn-primary shadow-lg mb-4">
+            <button className="w-full btn btn-secondary shadow-lg mb-4">
               Sign in
             </button>
           )}

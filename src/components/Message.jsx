@@ -1,6 +1,17 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { ChatContext } from "../contexts/ChatContext";
+import moment from "moment/moment";
+
+function formatFirebaseTimestamp(timestamp) {
+  const date = timestamp.toDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const period = hours >= 12 ? 'pm' : 'am';
+
+  const formattedTime = `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${period}`;
+  return formattedTime;
+}
 
 const Message = ({ message }) => {
   const { currentUser } = useContext(AuthContext);
@@ -10,6 +21,12 @@ const Message = ({ message }) => {
   useEffect(() => {
     chatWindowRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [message]);
+
+  const timeInMiliseconds = message.date.seconds * 1000;
+
+  const timeAgo = moment(timeInMiliseconds).fromNow();
+
+  const formattedTime = formatFirebaseTimestamp(message.date);
 
   return (
     <div
@@ -29,9 +46,11 @@ const Message = ({ message }) => {
           />
         </div>
       </div>
-      <div className="chat-header">Obi-Wan Kenobi</div>
-      <div className="chat-bubble">{message.textMsg}</div>
-      <div className="chat-footer opacity-50">Just now</div>
+      <div className="chat-bubble">
+        {message.img && <img className="my-2" src={message.img} />}
+        <span>{message.textMsg}</span>
+      </div>
+      <div className="chat-footer opacity-50">{formattedTime}</div>
     </div>
   );
 };

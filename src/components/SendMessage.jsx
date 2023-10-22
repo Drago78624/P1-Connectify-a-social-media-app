@@ -18,6 +18,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 const SendMessage = () => {
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -30,6 +31,7 @@ const SendMessage = () => {
     const textMsg = msgData.text;
     const img = msgData.image[0];
 
+    setLoading(true);
     if (img) {
       const storageRef = ref(storage, uuid());
 
@@ -65,6 +67,7 @@ const SendMessage = () => {
                 img: downloadURL,
               }),
             });
+            setLoading(false);
           });
         }
       );
@@ -77,6 +80,7 @@ const SendMessage = () => {
           date: Timestamp.now(),
         }),
       });
+      setLoading(false);
     }
 
     await updateDoc(doc(db, "userChats", currentUser.uid), {
@@ -120,8 +124,12 @@ const SendMessage = () => {
             />
           </div>
         </div>
-        <button className="btn btn-primary shadow-lg">
-          <MdSend fontSize={24} />
+        <button onClick={sendMessage} className="btn btn-secondary shadow-lg">
+          {loading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            <MdSend fontSize={24} />
+          )}
         </button>
       </form>
     </div>

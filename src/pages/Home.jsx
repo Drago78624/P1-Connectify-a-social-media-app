@@ -23,7 +23,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="h-[70%] mt-10 lg:h-auto container max-w-7xl mx-auto flex justify-center shadow-lg">
+      <div className="h-[70%] mt-10 lg:h-auto container max-w-7xl mx-auto flex justify-center shadow-2xl">
         <div className="lg:block min-h-[800px] overflow-y-auto hidden flex-[2] bg-base-200 p-4">
           <div>
             <SearchUser />
