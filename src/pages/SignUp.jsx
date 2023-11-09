@@ -13,6 +13,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const formSchema = yup.object().shape({
     displayName: yup.string().required("Please enter a display name"),
@@ -36,12 +37,13 @@ const SignUp = () => {
     setLoading(true);
     try {
       const res = await createUserWithEmailAndPassword(
-        auth,
+        auth, 
         data.email,
         data.password
       );
       //  SAVING USER AVATAR IN FIREBASE STORAGE
       const storageRef = ref(storage, data.displayName);
+      console.log(data.avatar[0])
 
       const uploadTask = uploadBytesResumable(storageRef, data.avatar[0]);
 

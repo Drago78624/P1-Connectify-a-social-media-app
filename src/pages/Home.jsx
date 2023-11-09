@@ -8,6 +8,7 @@ import SearchUser from "../components/SearchUser";
 import TestProfImg from "../assets/levi.jpg";
 
 const Home = () => {
+  console.log("rest")
 
   return (
     <div className="h-screen">

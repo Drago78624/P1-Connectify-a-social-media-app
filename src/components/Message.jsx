@@ -7,9 +7,12 @@ function formatFirebaseTimestamp(timestamp) {
   const date = timestamp.toDate();
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  const period = hours >= 12 ? 'pm' : 'am';
+  const period = hours >= 12 ? "pm" : "am";
 
-  const formattedTime = `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${period}`;
+  const formattedTime = `${hours % 12 || 12}:${String(minutes).padStart(
+    2,
+    "0"
+  )} ${period}`;
   return formattedTime;
 }
 
